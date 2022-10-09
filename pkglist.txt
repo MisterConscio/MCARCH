@@ -15,6 +15,7 @@ xorg-xinit
 i3-gaps
 i3lock
 i3status
+bspwm
 polybar
 alacritty
 zsh
@@ -37,6 +38,9 @@ xclip
 python-pywal
 maim
 pulsemixer
+pipewire-alsa
+pipewire-jack
+pipewire-pulse
 ddcutil
 dunst
 libnotify
@@ -78,4 +82,4 @@ typescript
 typescript-language-server
 pyright
 sxhkd
-bspwm
+qt5ct

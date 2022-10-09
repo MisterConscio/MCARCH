@@ -1,14 +1,10 @@
 #!/usr/bin/env sh
 
-# This script is supposed to be executed as the root user
-
-# pkg_list_url="https://raw.githubusercontent.com/MisterConscio/dotfiles/main/pkglist.txt"
+dotfiles_repo="https://github.com/MisterConscio/dotfiles.git"
 pkg_list="pkglist.txt"
 aur_list="aurlist.txt"
-dotfiles_repo="https://github.com/MisterConscio/dotfiles.git"
 aurhelper="yay"
 aurhelper_git="https://aur.archlinux.org/yay.git"
-falsename="conscio"
 
 bold=$(tput bold)
 normal=$(tput sgr0)
@@ -42,7 +38,7 @@ mkfilestruct() {
   sudo -u "$name" mkdir -pv /home/$name/.config/{mpd,ncmpcpp,zsh} \
     /home/$name/.cache/zsh \
     /home/$name/.local/{src,share/{gnupg,npm}} \
-    /home/$name/media/{pic/screenshot,vid,mus,samp,proj} \
+  /home/$name/media/{pic/screenshot,vid,mus,samp,proj,emu} \
     /home/$name/{dev,doc}
   mkdir -pv /mnt/{externo,ssd,usb1,usb2,usb3}
   cd /mnt && chown -v -R $name:$name *
@@ -83,7 +79,10 @@ dotfiles() {
 
 pacinstall() {
   message "Instalação de programas"
-  [[ ! -e "$dotdir/$pkglist" ]] && error "O arquivo $pkg_list não existe"
+  cd /home/$name
+  curl -LO "https://raw.githubusercontent.com/MisterConscio/MCARCH/main/pkglist.txt"
+  curl -LO "https://raw.githubusercontent.com/MisterConscio/MCARCH/main/aurlist.txt"
+  [[ ! -e "/home/$name/$pkg_list" ]] && error "O arquivo $pkg_list não existe"
   echo "${bold}Iniciando a instalação...${normal}"
   pacman --noconfirm --needed -S - < "$pkg_list"
   message "Finalizada"
@@ -102,7 +101,9 @@ aurinstall() {
 aurpkg() {
   message "Instalação de pacotes AUR"
   echo "Instalando pacotes do AUR..."
-  cd "$dotdir"
+  cd /home/$name
+  [[ ! -e "/home/$name/$aur_list" ]] && error "O arquivo $aur_list não existe"
+  # cd "$dotdir"
   sudo -u "$name" yay -S --removemake --noconfirm - < "$aur_list"
   message "Finalizada"
 }
@@ -126,7 +127,7 @@ changeshell() {
 }
 
 addgroups() {
-  message "APA 8: Adcionando ao usuário grupos"
+  message "Adcionando ao usuário grupos"
   usermod -aG wheel,video,audio,lp,network,kvm,storage,i2c "$name"
   echo "command: usermod -aG wheel,video,audio,lp,network,kvm,storage,i2c $name"
   message "Finalizada"
@@ -134,11 +135,11 @@ addgroups() {
 
 cleanup() {
   message "Limpeza"
-  rm -rfv /home/$name/{muhinstall.sh,.bash_logout,.bashrc,.bash_profile,go,.gnupg}
+  rm -rfv /home/$name/{mcarch.sh,${pkg_list},${aur_list},.bash_logout,.bashrc,.bash_profile,go,.gnupg}
   message "Finalizada"
 }
 
-# Atualização de sistema inicial
+# Atualização de sistema inicial (Script starts here)
 pacman --noconfirm -Syyu ||
   error "Você não está rodando o script como root ou não possui acesso à internet"
 
@@ -154,8 +155,8 @@ hello || error
 mkfilestruct || error
 
 # Configuração do pacman e arquivo temporário sudoers
-echo "%wheel ALL=(ALL) NOPASSWD: ALL" >/etc/sudoers.d/09_sudotemp
-trap 'rm -f /etc/sudoers.d/09_sudotemp' QUIT EXIT
+echo "%wheel ALL=(ALL) NOPASSWD: ALL" >/etc/sudoers.d/99_sudotemp
+trap 'rm -f /etc/sudoers.d/99_sudotemp' QUIT EXIT
 setpacman || error
 
 # Repositório dos dotfiles
@@ -182,6 +183,7 @@ addgroups || error
 # Limpeza
 cleanup || error
 
+# Configuração do servidor de áudio Jack para uso do Realtime Scheduling
 [ ! -e /etc/security/limits.d/00-audio.conf ] &&
   mkdir -pv /etc/security/limits.d/ &&
   cat << EOF > /etc/security/limits.d/00-audio.conf
