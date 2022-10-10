@@ -47,14 +47,14 @@ mkfilestruct() {
 
 setpacman() {
   message "Configuração do pacman e sudoers"
-  pacman --noconfirm --needed -S pacman-contrib
+  # pacman --noconfirm --needed -S pacman-contrib
 
   sed -Ei "s/^#(ParallelDownloads).*/\1 = 5/;/^#Color$/s/#//;/^#VerbosePkgLists$/s/#//" /etc/pacman.conf
   sed -i "s/-j2/-j$(nproc)/;/^#MAKEFLAGS/s/^#//" /etc/makepkg.conf
 
-  cp -v /etc/pacman.d/mirrorlist /etc/pacman.d/mirrorlist.backup
-  echo "Testando velocidade dos repositórios..."
-  rankmirrors -n 6 /etc/pacman.d/mirrorlist.backup > /etc/pacman.d/mirrorlist
+  # cp -v /etc/pacman.d/mirrorlist /etc/pacman.d/mirrorlist.backup
+  # echo "Testando velocidade dos repositórios..."
+  # rankmirrors -n 6 /etc/pacman.d/mirrorlist.backup > /etc/pacman.d/mirrorlist
 
   sudo pacman --noconfirm -Syy
   message "Finalizada"
@@ -135,7 +135,8 @@ addgroups() {
 
 cleanup() {
   message "Limpeza"
-  rm -rfv /home/$name/{mcarch.sh,${pkg_list},${aur_list},.bash_logout,.bashrc,.bash_profile,go,.gnupg}
+  rm -rfv /home/$name/{mcarch.sh,${pkg_list},${aur_list},.bash_logout,.bashrc,.bash_profile,go}
+  mv -v /home/$name/.gnupg /home/$name/.local/share
   message "Finalizada"
 }
 
