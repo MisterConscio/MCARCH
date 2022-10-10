@@ -37,6 +37,7 @@ xwallpaper
 xclip
 python-pywal
 maim
+jq
 pulsemixer
 pipewire-alsa
 pipewire-jack

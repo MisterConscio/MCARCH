@@ -38,7 +38,7 @@ mkfilestruct() {
   sudo -u "$name" mkdir -pv /home/$name/.config/{mpd,ncmpcpp,zsh} \
     /home/$name/.cache/zsh \
     /home/$name/.local/{src,share/{gnupg,npm}} \
-  /home/$name/media/{pic/screenshot,vid,mus,samp,proj,emu} \
+    /home/$name/media/{pic/{screenshot,wallpaper},vid,mus,samp,proj,emu} \
     /home/$name/{dev,doc}
   mkdir -pv /mnt/{externo,ssd,usb1,usb2,usb3}
   cd /mnt && chown -v -R $name:$name *
@@ -68,12 +68,6 @@ dotfiles() {
   sudo -u "$name" git clone "$dotfiles_repo" $dotdir
   cd $dotdir
   sudo -u "$name" stow -v */
-    # i3 alacritty x11 zsh \
-    # polybar xdg scripts gtk \
-    # dircolors mpd ncmpcpp dunst \
-    # lf fontconfig rofi nvim \
-    # zathura tmux bspwm npm
-  # nvim -c "PlugInstall|q|q"
   message "Finalizada"
 }
 
@@ -136,7 +130,7 @@ addgroups() {
 cleanup() {
   message "Limpeza"
   rm -rfv /home/$name/{mcarch.sh,${pkg_list},${aur_list},.bash_logout,.bashrc,.bash_profile,go}
-  mv -v /home/$name/.gnupg /home/$name/.local/share
+  mv -v /home/$name/.gnupg /home/$name/.local/share/gnupg
   message "Finalizada"
 }
 
