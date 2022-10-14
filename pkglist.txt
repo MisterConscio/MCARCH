@@ -82,5 +82,7 @@ bash-language-server
 typescript
 typescript-language-server
 pyright
+shellcheck
 sxhkd
 qt5ct
+kvantum
