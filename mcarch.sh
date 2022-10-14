@@ -1,4 +1,4 @@
-#!/usr/bin/env sh
+#!/usr/bin/env bash
 
 dotfiles_repo="https://github.com/MisterConscio/dotfiles.git"
 pkg_list="pkglist.txt"
@@ -27,7 +27,7 @@ hello() {
   sleep 2
   echo "Esse script é destinado para sistemas ${bold}Arch Linux${normal}"
   sleep 2
-  read -p "Antes de começar, por farvor ${bold}informe seu usuário${normal}: " name
+  read -rp "Antes de começar, por farvor ${bold}informe seu usuário${normal}: " name
   [[ ! $(id -u "$name") ]] && error "O usuário ${name} não existe"
   echo "${bold}Vamos-lá ${name} :)${normal}"
   sleep 1
@@ -35,13 +35,13 @@ hello() {
 
 mkfilestruct() {
   message "Estrutura de arquivos"
-  sudo -u "$name" mkdir -pv /home/$name/.config/{mpd,ncmpcpp,zsh} \
-    /home/$name/.cache/zsh \
-    /home/$name/.local/{src,share/{gnupg,npm}} \
-    /home/$name/media/{pic/{screenshot,wallpaper},vid,mus,samp,proj,emu} \
-    /home/$name/{dev,doc}
+  sudo -u "$name" mkdir -pv /home/"$name"/.config/{mpd,ncmpcpp,zsh} \
+    /home/"$name"/.cache/zsh \
+    /home/"$name"/.local/{src,state,share/{gnupg,npm}} \
+    /home/"$name"/media/{pic/{screenshot,wallpaper},vid,mus,samp,proj,emu} \
+    /home/"$name"/{dev,doc}
   mkdir -pv /mnt/{externo,ssd,usb1,usb2,usb3}
-  cd /mnt && chown -v -R $name:$name *
+  cd /mnt && chown -v -R "$name":"$name" ./*
   message "Finalizada"
 }
 
@@ -65,15 +65,15 @@ dotfiles() {
   dotdir="/home/$name/dotfiles"
   pacman --noconfirm --needed -S stow git
   echo -e "\nClonando o repositório dos dotfiles..."
-  sudo -u "$name" git clone "$dotfiles_repo" $dotdir
-  cd $dotdir
-  sudo -u "$name" stow -v */
+  sudo -u "$name" git clone "$dotfiles_repo" "$dotdir"
+  cd "$dotdir" || error "cd failed"
+  sudo -u "$name" stow -v .*/
   message "Finalizada"
 }
 
 pacinstall() {
   message "Instalação de programas"
-  cd /home/$name
+  cd /home/"$name" || error "cd failed"
   curl -LO "https://raw.githubusercontent.com/MisterConscio/MCARCH/main/pkglist.txt"
   curl -LO "https://raw.githubusercontent.com/MisterConscio/MCARCH/main/aurlist.txt"
   [[ ! -e "/home/$name/$pkg_list" ]] && error "O arquivo $pkg_list não existe"
@@ -86,8 +86,8 @@ aurinstall() {
   message "Instalação do Yay"
   echo "Instalando ${aurhelper} como AUR helper..."
   local aurdir="/home/$name/.local/src/$aurhelper"
-  sudo -u "$name" git clone "$aurhelper_git" $aurdir
-  cd $aurdir
+  sudo -u "$name" git clone "$aurhelper_git" "$aurdir"
+  cd "$aurdir" || error "cd failed"
   sudo -u "$name" makepkg -sirc --noconfirm || error
   message "Finalizada"
 }
@@ -95,7 +95,7 @@ aurinstall() {
 aurpkg() {
   message "Instalação de pacotes AUR"
   echo "Instalando pacotes do AUR..."
-  cd /home/$name
+  cd /home/"$name" || error "cd failed"
   [[ ! -e "/home/$name/$aur_list" ]] && error "O arquivo $aur_list não existe"
   # cd "$dotdir"
   sudo -u "$name" yay -S --removemake --noconfirm - < "$aur_list"
@@ -104,7 +104,7 @@ aurpkg() {
 
 vimplug() {
   message "Instalação dos plugins do vim"
-  sudo -u "$name" mkdir -pv /home/$name/.local/share/nvim/site/autoload
+  sudo -u "$name" mkdir -pv /home/"$name"/.local/share/nvim/site/autoload
   curl -Ls \
     "https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim" > \
     "/home/$name/.local/share/nvim/site/autoload/plug.vim"
@@ -129,8 +129,8 @@ addgroups() {
 
 cleanup() {
   message "Limpeza"
-  rm -rfv /home/$name/{mcarch.sh,${pkg_list},${aur_list},.bash_logout,.bashrc,.bash_profile,go}
-  mv -v /home/$name/.gnupg /home/$name/.local/share/gnupg
+  rm -rfv /home/"${name:?}"/{mcarch.sh,"${pkg_list}","${aur_list}",.bash_logout,.bashrc,.bash_profile,go}
+  mv -v /home/"${name:?}"/.gnupg /home/"$name"/.local/share/gnupg
   message "Finalizada"
 }
 
