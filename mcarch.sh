@@ -37,7 +37,7 @@ mkfilestruct() {
   message "Estrutura de arquivos"
   sudo -u "$name" mkdir -pv /home/"$name"/.config/{mpd,ncmpcpp,zsh} \
     /home/"$name"/.cache/zsh \
-    /home/"$name"/.local/{src,state,share/{gnupg,npm}} \
+    /home/"$name"/.local/{src,state,share/{gnupg,npm,wallpaper}} \
     /home/"$name"/media/{pic/{screenshot,wallpaper},vid,mus,samp,proj,emu} \
     /home/"$name"/{dev,doc}
   mkdir -pv /mnt/{externo,ssd,usb1,usb2,usb3}
@@ -67,7 +67,7 @@ dotfiles() {
   echo -e "\nClonando o repositório dos dotfiles..."
   sudo -u "$name" git clone "$dotfiles_repo" "$dotdir"
   cd "$dotdir" || error "cd failed"
-  sudo -u "$name" stow -v .*/
+  sudo -u "$name" stow -v -- */
   message "Finalizada"
 }
 

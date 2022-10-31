@@ -24,6 +24,7 @@ neovim
 tmux
 git
 stow
+dash
 noto-fonts
 noto-fonts-emoji
 ttf-font-awesome
@@ -70,7 +71,7 @@ fzf
 bat
 gdu
 tree
-bashtop
+btop
 htop
 archlinux-wallpaper
 keepassxc
