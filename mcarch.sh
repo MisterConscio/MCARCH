@@ -67,7 +67,7 @@ dotfiles() {
   echo -e "\nClonando o repositório dos dotfiles..."
   sudo -u "$name" git clone "$dotfiles_repo" "$dotdir"
   cd "$dotdir" || error "cd failed"
-  sudo -u "$name" stow -v ./*/
+  sudo -u "$name" stow -v */
   message "Finalizada"
 }
 
