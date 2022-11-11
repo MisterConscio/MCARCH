@@ -3,4 +3,3 @@ xcursor-breeze
 vscode-langservers-extracted
 lf
 mpdscribble
-simple-mtpfs

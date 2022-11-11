@@ -16,6 +16,7 @@ i3-gaps
 i3lock
 i3status
 bspwm
+sxhkd
 polybar
 alacritty
 zsh
@@ -39,10 +40,12 @@ xclip
 python-pywal
 maim
 jq
-pulsemixer
+pipewire
 pipewire-alsa
 pipewire-jack
 pipewire-pulse
+wireplumber
+pulsemixer
 ddcutil
 dunst
 libnotify
@@ -84,6 +87,5 @@ typescript
 typescript-language-server
 pyright
 shellcheck
-sxhkd
 qt5ct
 kvantum
