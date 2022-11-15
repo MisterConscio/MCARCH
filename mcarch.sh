@@ -1,10 +1,7 @@
 #!/usr/bin/env bash
 
-dotfiles_repo="https://github.com/MisterConscio/dotfiles.git"
 pkg_list="pkglist.txt"
 aur_list="aurlist.txt"
-aurhelper="yay"
-aurhelper_git="https://aur.archlinux.org/yay.git"
 
 bold=$(tput bold)
 normal=$(tput sgr0)
@@ -62,6 +59,7 @@ setpacman() {
 }
 
 dotfiles() {
+  dotfiles_repo="https://github.com/MisterConscio/dotfiles.git"
   message "Repositório dos dotfiles"
   dotdir="/home/$name/dotfiles"
   pacman --noconfirm --needed -S stow git
@@ -84,6 +82,8 @@ pacinstall() {
 }
 
 aurinstall() {
+  aurhelper="yay"
+  aurhelper_git="https://aur.archlinux.org/yay.git"
   message "Instalação do Yay"
   echo "Instalando ${aurhelper} como AUR helper..."
   aurdir="/home/$name/.local/src/$aurhelper"

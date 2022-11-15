@@ -46,6 +46,7 @@ pipewire-jack
 pipewire-pulse
 wireplumber
 pulsemixer
+alsa-utils
 ddcutil
 dunst
 libnotify
