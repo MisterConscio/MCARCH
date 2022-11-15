@@ -21,6 +21,7 @@ message() {
 }
 
 hello() {
+  clear
   echo -e "\n${bold}Bem vindo${normal}\n"
   sleep 2
   echo "Irá começar o script de instalação"
@@ -28,7 +29,7 @@ hello() {
   echo "Esse script é destinado para sistemas ${bold}Arch Linux${normal}"
   sleep 2
   read -rp "Antes de começar, por farvor ${bold}informe seu usuário${normal}: " name
-  [[ ! $(id -u "$name") ]] && error "O usuário ${name} não existe"
+  [ ! "$(id -u "$name")" ] && error "O usuário ${name} não existe"
   echo "${bold}Vamos-lá ${name} :)${normal}"
   sleep 1
 }
@@ -37,7 +38,7 @@ mkfilestruct() {
   message "Estrutura de arquivos"
   sudo -u "$name" mkdir -pv /home/"$name"/.config/{mpd,ncmpcpp,zsh} \
     /home/"$name"/.cache/zsh \
-    /home/"$name"/.local/{src,state,share/{gnupg,npm,backgrounds}} \
+    /home/"$name"/.local/{src,state,share/{npm,backgrounds}} \
     /home/"$name"/media/{pic/screenshot,vid,mus,samp,proj,emu} \
     /home/"$name"/{dev,doc}
   mkdir -pv /mnt/{externo,ssd,usb1,usb2,usb3}
@@ -76,7 +77,7 @@ pacinstall() {
   cd /home/"$name" || error "cd failed"
   curl -LO "https://raw.githubusercontent.com/MisterConscio/MCARCH/main/pkglist.txt"
   curl -LO "https://raw.githubusercontent.com/MisterConscio/MCARCH/main/aurlist.txt"
-  [[ ! -e "/home/$name/$pkg_list" ]] && error "O arquivo $pkg_list não existe"
+  [ ! -e "/home/$name/$pkg_list" ] && error "O arquivo $pkg_list não existe"
   echo "${bold}Iniciando a instalação...${normal}"
   pacman --noconfirm --needed -S - < "$pkg_list"
   message "Finalizada"
@@ -85,7 +86,7 @@ pacinstall() {
 aurinstall() {
   message "Instalação do Yay"
   echo "Instalando ${aurhelper} como AUR helper..."
-  local aurdir="/home/$name/.local/src/$aurhelper"
+  aurdir="/home/$name/.local/src/$aurhelper"
   sudo -u "$name" git clone "$aurhelper_git" "$aurdir"
   cd "$aurdir" || error "cd failed"
   sudo -u "$name" makepkg -sirc --noconfirm || error
@@ -96,7 +97,7 @@ aurpkg() {
   message "Instalação de pacotes AUR"
   echo "Instalando pacotes do AUR..."
   cd /home/"$name" || error "cd failed"
-  [[ ! -e "/home/$name/$aur_list" ]] && error "O arquivo $aur_list não existe"
+  [ ! -e "/home/$name/$aur_list" ] && error "O arquivo $aur_list não existe"
   # cd "$dotdir"
   sudo -u "$name" yay -S --removemake --noconfirm - < "$aur_list"
   message "Finalizada"
