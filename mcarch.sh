@@ -45,14 +45,14 @@ mkfilestruct() {
 
 setpacman() {
   message "Configuração do pacman e sudoers"
-  # pacman --noconfirm --needed -S pacman-contrib
+  pacman --noconfirm --needed -S pacman-contrib
 
   sed -Ei "s/^#(ParallelDownloads).*/\1 = 5/;/^#Color$/s/#//;/^#VerbosePkgLists$/s/#//" /etc/pacman.conf
   sed -i "s/-j2/-j$(nproc)/;/^#MAKEFLAGS/s/^#//" /etc/makepkg.conf
 
-  # cp -v /etc/pacman.d/mirrorlist /etc/pacman.d/mirrorlist.backup
-  # echo "Testando velocidade dos repositórios..."
-  # rankmirrors -n 6 /etc/pacman.d/mirrorlist.backup > /etc/pacman.d/mirrorlist
+  cp -v /etc/pacman.d/mirrorlist /etc/pacman.d/mirrorlist.backup
+  echo "Testando velocidade dos repositórios..."
+  rankmirrors -n 10 /etc/pacman.d/mirrorlist.backup > /etc/pacman.d/mirrorlist
 
   sudo pacman --noconfirm -Syy
   message "Finalizada"
@@ -188,9 +188,22 @@ cleanup || error
 @audio   -  memlock    unlimited
 EOF
 
+# Setting xorg keyboard layout
+[ ! -f "/etc/X11/xorg.conf.d/00-keyboard.conf" ] &&
+  mkdir -pv /etc/X11/xorg.conf.d &&
+  cat << EOF > /etc/X11/xorg.conf.d/00-keyboard.conf
+Section "InputClass"
+        Identifier "system-keyboard"
+        MatchIsKeyboard "on"
+        Option "XkbLayout" "br"
+        Option "XkbModel" "abnt2"
+        Option "XkbOptions" "terminate:ctrl_alt_bksp"
+EndSection
+EOF
+
 echo "%wheel ALL=(ALL:ALL) ALL" > /etc/sudoers.d/00-sudo-wheel
 echo -e "Defaults timestamp_timeout=30\nDefaults timestamp_type=global" > /etc/sudoers.d/01-sudo-time
 
 echo "PROMPT='%F{red}%B%1~%b%f %(!.#.>>) '" > /root/.zshrc
 
-echo -e "\n${bold}Parece que tudo ocorreu bem, por favor, reinicie o sistema${normal}"
+echo -e "\n${bold}Parece que tudo ocorreu bem, por favor, reinicie o sistema${normal}\n"
