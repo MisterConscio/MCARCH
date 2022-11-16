@@ -27,6 +27,7 @@ hello() {
   sleep 2
   read -rp "Antes de começar, por farvor ${bold}informe seu usuário${normal}: " name
   [ ! "$(id -u "$name")" ] && error "O usuário ${name} não existe"
+  read -rp "Por farvor, ${bold}informe qual é sua placa de vídeo${normal} [nvidia/intel/amd]: " video
   echo "${bold}Vamos-lá ${name} :)${normal}"
   sleep 1
 }
@@ -47,7 +48,8 @@ setpacman() {
   message "Configuração do pacman e sudoers"
   pacman --noconfirm --needed -S pacman-contrib
 
-  sed -Ei "s/^#(ParallelDownloads).*/\1 = 5/;/^#Color$/s/#//;/^#VerbosePkgLists$/s/#//" /etc/pacman.conf
+  sed -E i "s/^#(ParallelDownloads).*/\1 = 5/;/^#Color$/s/#//;/^#VerbosePkgLists$/s/#//" \
+    -i "/\[multilib\]/,/Include/"'s/^#//' /etc/pacman.conf
   sed -i "s/-j2/-j$(nproc)/;/^#MAKEFLAGS/s/^#//" /etc/makepkg.conf
 
   cp -v /etc/pacman.d/mirrorlist /etc/pacman.d/mirrorlist.backup
@@ -78,6 +80,12 @@ pacinstall() {
   [ ! -e "/home/$name/$pkg_list" ] && error "O arquivo $pkg_list não existe"
   echo "${bold}Iniciando a instalação...${normal}"
   pacman --noconfirm --needed -S - < "$pkg_list"
+  case "$video" in
+    intel) pacman --noconfirm --needed -S xf86-video-intel lib32-mesa;;
+    amd) pacman --noconfirm --needed -S xf86-video-amdgpu xf86-video-ati lib32-mesa;;
+    nvidia) pacman --noconfirm --needed -S nvidia nvidia-utils lib32-nvidia-utils;;
+    *) echo "Placa de vídeo incorreta ou não especificada";;
+  esac
   message "Finalizada"
 }
 
@@ -142,11 +150,6 @@ pacman --noconfirm -Syyu ||
 # Mesangem de boas vindas e informação do usuário
 hello || error
 
-# Some export for building a few packages
-# GNUPGHOME="/home/$name/.local/share/gnupg"
-# NPM_CONFIG_USERCONFIG="/home/$name/.config/npm/npmrc"
-# GOPATH="/home/$name/.local/share/go"
-
 # Estrutura de arquivos pessoal
 mkfilestruct || error
 
@@ -188,7 +191,7 @@ cleanup || error
 @audio   -  memlock    unlimited
 EOF
 
-# Setting xorg keyboard layout
+# Configuração do teclado no xorg
 [ ! -f "/etc/X11/xorg.conf.d/00-keyboard.conf" ] &&
   mkdir -pv /etc/X11/xorg.conf.d &&
   cat << EOF > /etc/X11/xorg.conf.d/00-keyboard.conf
