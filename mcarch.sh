@@ -49,7 +49,7 @@ setpacman() {
   pacman --noconfirm --needed -S pacman-contrib
 
   sed -E i "s/^#(ParallelDownloads).*/\1 = 5/;/^#Color$/s/#//;/^#VerbosePkgLists$/s/#//" \
-    -i "/\[multilib\]/,/Include/"'s/^#//' /etc/pacman.conf
+    -i "/\[multilib\]/,/Include/s/#//" /etc/pacman.conf
   sed -i "s/-j2/-j$(nproc)/;/^#MAKEFLAGS/s/^#//" /etc/makepkg.conf
 
   cp -v /etc/pacman.d/mirrorlist /etc/pacman.d/mirrorlist.backup
@@ -206,6 +206,8 @@ EOF
 
 echo "%wheel ALL=(ALL:ALL) ALL" > /etc/sudoers.d/00-sudo-wheel
 echo -e "Defaults timestamp_timeout=30\nDefaults timestamp_type=global" > /etc/sudoers.d/01-sudo-time
+echo "%wheel ALL=(ALL:ALL) NOPASSWD: /usr/bin/shutdown,/usr/bin/reboot,/usr/bin/systemctl suspend,/usr/bin/mount,/usr/bin/umount" > /etc/sudoers.d/02-cmd-nopasswd
+echo "Defaults editor=/usr/bin/nvim" > /etc/sudoers.d/03-visudo-editor
 
 echo "PROMPT='%F{red}%B%1~%b%f %(!.#.>>) '" > /root/.zshrc
 
