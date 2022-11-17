@@ -48,9 +48,7 @@ setpacman() {
   message "Configuração do pacman e sudoers"
   pacman --noconfirm --needed -S pacman-contrib
 
-  sed -E -i "s/^#(ParallelDownloads).*/\1 = 5/" \
-    -i "/^#Color$/s/#//;/^#VerbosePkgLists$/s/#//" \
-    -i "/\[multilib\]/,/Include/s/#//" /etc/pacman.conf
+  sed -E -i "s/^#(ParallelDownloads).*/\1 = 5/;/^#Color$/s/#//;/^#VerbosePkgLists$/s/#//;/\[multilib\]/,/Include/s/#//" /etc/pacman.conf
   sed -i "s/-j2/-j$(nproc)/;/^#MAKEFLAGS/s/^#//" /etc/makepkg.conf
 
   cp -v /etc/pacman.d/mirrorlist /etc/pacman.d/mirrorlist.backup
