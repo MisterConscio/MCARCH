@@ -170,7 +170,7 @@ aurinstall || error
 aurpkg || error
 
 # Vimplug install
-vimplug || error
+# vimplug || error
 
 # Mudança de shell para zsh
 changeshell || error
