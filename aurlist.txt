@@ -1,5 +1,4 @@
 nerd-fonts-droid-sans-mono
 xcursor-breeze
-vscode-langservers-extracted
 lf
 mpdscribble
