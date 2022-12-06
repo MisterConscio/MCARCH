@@ -85,4 +85,5 @@ imagemagick
 arc-gtk-theme
 shellcheck
 qt5ct
+socat
 kvantum
