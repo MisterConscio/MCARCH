@@ -1,30 +1,30 @@
 #!/usr/bin/env bash
 
-bold=$(tput bold)
-normal=$(tput sgr0)
+BOLD="\e[1m"
+GREEN="\e[32m"
+RED="\e[31m"
+NORMAL="\e[0m"
 
 error() {
-  echo -e "\n${bold}${1:-Ocorreu algum erro}${normal}\n"
-  sleep 1
+  printf "${RED}==>${NORMAL}${BOLD}%s${NORMAL}\n" "${1:-Aconteceu algum erro}" >&2
   exit 1
 }
 
 message() {
-  echo -e "\n${bold}$1${normal}\n" >&2
-  sleep 0.5
+  printf "${GREEN}==>${NORMAL}${BOLD}%s${NORMAL}\n" "$1"
 }
 
 hello() {
   clear
-  echo -e "\n${bold}Bem vindo${normal}\n"
-  echo "Irá começar o script de instalação"
-  echo "Esse script é destinado para sistemas ${bold}Arch Linux${normal}"
+  printf "\n${BOLD}Bem vindo${NORMAL}\n"
+  printf "Irá começar o script de instalação\n"
+  printf "Esse script é destinado para sistemas ${BOLD}Arch Linux${NORMAL}\n"
 
-  read -rp "Antes de começar, por farvor ${bold}informe seu usuário${normal}: " name
+  read -rp "Antes de começar, por farvor ${BOLD}informe seu usuário${NORMAL}: " name
   [ ! "$(id -u "$name")" ] && error "O usuário ${name} não existe"
 
-  read -rp "Por farvor, ${bold}informe qual é sua placa de vídeo${normal} [nvidia/intel/amd]: " video
-  echo "${bold}Vamos-lá ${name} :)${normal}"
+  read -rp "Por farvor, ${BOLD}informe qual é sua placa de vídeo${NORMAL} [nvidia/intel/amd]: " video
+  printf "${BOLD}Vamos-lá ${name} :)${NORMAL}\n"
 
   sleep 1
 }
@@ -40,8 +40,6 @@ mkfilestruct() {
 
   mkdir -pv /mnt/{externo,ssd,usb1,usb2,usb3}
   cd /mnt && chown -v -R "$name":"$name" ./*
-
-  message "Finalizada"
 }
 
 setpacman() {
@@ -57,7 +55,6 @@ setpacman() {
   rankmirrors -n 10 /etc/pacman.d/mirrorlist.backup > /etc/pacman.d/mirrorlist
 
   sudo pacman --noconfirm -Syy
-  message "Finalizada"
 }
 
 dotfiles() {
@@ -71,8 +68,6 @@ dotfiles() {
   sudo -u "$name" git clone "$dotfiles_repo" "$dotdir"
   cd "$dotdir" || error "cd failed"
   sudo -u "$name" stow -v */
-
-  message "Finalizada"
 }
 
 pacinstall() {
@@ -83,8 +78,8 @@ pacinstall() {
 
   cd /home/"$name" || error "cd failed"
 
-  curl -L "https://raw.githubusercontent.com/MisterConscio/MCARCH/main/pkglist.txt" -o "$pkg_list"
-  curl -L "https://raw.githubusercontent.com/MisterConscio/MCARCH/main/aurlist.txt" -o "$aur_list"
+  curl -L "https://raw.githubusercontent.com/MisterConscio/mcarch/main/pkglist.txt" -o "$pkg_list"
+  curl -L "https://raw.githubusercontent.com/MisterConscio/mcarch/main/aurlist.txt" -o "$aur_list"
 
   [ ! -f "$pkg_list" ] && error "O arquivo $pkg_list não existe"
 
@@ -96,8 +91,6 @@ pacinstall() {
     nvidia) pacman --noconfirm --needed -S nvidia nvidia-utils lib32-nvidia-utils;;
     *) echo "Placa de vídeo incorreta ou não especificada";;
   esac
-
-  message "Finalizada"
 }
 
 aurinstall() {
@@ -112,8 +105,6 @@ aurinstall() {
   cd "$aurdir" || error "cd failed"
 
   sudo -u "$name" makepkg -sirc --noconfirm || error
-
-  message "Finalizada"
 }
 
 aurpkg() {
@@ -124,22 +115,6 @@ aurpkg() {
   [ ! -f "$aur_list" ] && error "O arquivo $aur_list não existe"
 
   sudo -u "$name" yay -S --removemake --noconfirm - < "$aur_list"
-
-  message "Finalizada"
-}
-
-vimplug() {
-  message "Instalação dos plugins do vim"
-
-  sudo -u "$name" mkdir -pv /home/"$name"/.local/share/nvim/site/autoload
-
-  curl -Ls \
-    "https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim" > \
-    "/home/$name/.local/share/nvim/site/autoload/plug.vim"
-
-  sudo -u "$name" nvim -c "PlugInstall|q|q"
-
-  message "Finalizada"
 }
 
 final_setup() {
@@ -148,19 +123,46 @@ final_setup() {
   chsh -s /usr/bin/zsh "$name"
   chsh -s /usr/bin/zsh root
 
+  echo "PROMPT='%F{red}%B%1~%b%f %(!.#.>>) '" > /root/.zshrc
+
   # Adição de grupos ao usuário
   message "Adcionando ao usuário grupos"
 
   usermod -aG wheel,video,audio,lp,network,kvm,storage,i2c "$name"
   echo "command: usermod -aG wheel,video,audio,lp,network,kvm,storage,i2c $name"
 
+  # Configuração do servidor de áudio Jack para uso do Realtime Scheduling
+  [ ! -e /etc/security/limits.d/00-audio.conf ] &&
+    mkdir -pv /etc/security/limits.d/ &&
+    cat << EOF > /etc/security/limits.d/00-audio.conf
+# Realtime Scheduling for jack server
+@audio   -  rtprio     95
+@audio   -  memlock    unlimited
+EOF
+
+  # Configuração do teclado no xorg
+  [ ! -f "/etc/X11/xorg.conf.d/00-keyboard.conf" ] &&
+    mkdir -pv /etc/X11/xorg.conf.d &&
+    cat << EOF > /etc/X11/xorg.conf.d/00-keyboard.conf
+Section "InputClass"
+        Identifier "system-keyboard"
+        MatchIsKeyboard "on"
+        Option "XkbLayout" "br"
+        Option "XkbModel" "abnt2"
+        Option "XkbOptions" "terminate:ctrl_alt_bksp"
+EndSection
+EOF
+
+  echo "%wheel ALL=(ALL:ALL) ALL" > /etc/sudoers.d/00-sudo-wheel
+  echo -e "Defaults timestamp_timeout=30\nDefaults timestamp_type=global" > /etc/sudoers.d/01-sudo-time
+  echo "%wheel ALL=(ALL:ALL) NOPASSWD: /usr/bin/poweroff,/usr/bin/reboot,/usr/bin/systemctl suspend,/usr/bin/mount,/usr/bin/umount" > /etc/sudoers.d/02-cmd-nopasswd
+  echo "Defaults editor=/usr/bin/nvim" > /etc/sudoers.d/03-visudo-editor
+
   # Cleanup
   message "Limpeza"
 
   rm -rfv /home/"$name"/.bash* /home/"$name"/.go
   mv -v /home/"$name"/.gnupg /home/"$name"/.local/share/gnupg
-
-  message "Finalizada"
 }
 
 # Atualização de sistema inicial (Script starts here)
@@ -190,39 +192,7 @@ aurinstall || error
 # Instalação de pacotes AUR
 aurpkg || error
 
-# Vimplug install
-# vimplug || error
-
 # Últimas configurações
 final_setup || error
 
-# Configuração do servidor de áudio Jack para uso do Realtime Scheduling
-[ ! -e /etc/security/limits.d/00-audio.conf ] &&
-  mkdir -pv /etc/security/limits.d/ &&
-  cat << EOF > /etc/security/limits.d/00-audio.conf
-# Realtime Scheduling for jack server
-@audio   -  rtprio     95
-@audio   -  memlock    unlimited
-EOF
-
-# Configuração do teclado no xorg
-[ ! -f "/etc/X11/xorg.conf.d/00-keyboard.conf" ] &&
-  mkdir -pv /etc/X11/xorg.conf.d &&
-  cat << EOF > /etc/X11/xorg.conf.d/00-keyboard.conf
-Section "InputClass"
-        Identifier "system-keyboard"
-        MatchIsKeyboard "on"
-        Option "XkbLayout" "br"
-        Option "XkbModel" "abnt2"
-        Option "XkbOptions" "terminate:ctrl_alt_bksp"
-EndSection
-EOF
-
-echo "%wheel ALL=(ALL:ALL) ALL" > /etc/sudoers.d/00-sudo-wheel
-echo -e "Defaults timestamp_timeout=30\nDefaults timestamp_type=global" > /etc/sudoers.d/01-sudo-time
-echo "%wheel ALL=(ALL:ALL) NOPASSWD: /usr/bin/poweroff,/usr/bin/reboot,/usr/bin/systemctl suspend,/usr/bin/mount,/usr/bin/umount" > /etc/sudoers.d/02-cmd-nopasswd
-echo "Defaults editor=/usr/bin/nvim" > /etc/sudoers.d/03-visudo-editor
-
-echo "PROMPT='%F{red}%B%1~%b%f %(!.#.>>) '" > /root/.zshrc
-
-echo -e "\n${bold}Parece que tudo ocorreu bem, por favor, reinicie o sistema${normal}\n"
+echo -e "\n${BOLD}Parece que tudo ocorreu bem, por favor, reinicie o sistema${NORMAL}\n"
