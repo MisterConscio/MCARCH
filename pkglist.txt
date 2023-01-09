@@ -87,3 +87,4 @@ shellcheck
 qt5ct
 socat
 kvantum
+bc

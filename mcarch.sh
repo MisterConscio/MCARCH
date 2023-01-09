@@ -6,12 +6,12 @@ RED="\e[31m"
 NORMAL="\e[0m"
 
 error() {
-  printf "${RED}==>${NORMAL}${BOLD}%s${NORMAL}\n" "${1:-Aconteceu algum erro}" >&2
+  printf "${RED}==>${NORMAL}${BOLD} %s${NORMAL}\n" "${1:-Aconteceu algum erro}" >&2
   exit 1
 }
 
 message() {
-  printf "${GREEN}==>${NORMAL}${BOLD}%s${NORMAL}\n" "$1"
+  printf "${GREEN}==>${NORMAL}${BOLD} %s${NORMAL}\n" "$1"
 }
 
 hello() {
