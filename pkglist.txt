@@ -88,3 +88,4 @@ qt5ct
 socat
 kvantum
 bc
+playerctl
