@@ -2,3 +2,4 @@ nerd-fonts-droid-sans-mono
 xcursor-breeze
 lf
 mpdscribble
+nsxiv

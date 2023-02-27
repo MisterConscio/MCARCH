@@ -61,7 +61,6 @@ ncmpcpp
 beets
 mpv
 yt-dlp
-sxiv
 zathura
 zathura-pdf-mupdf
 ueberzug
