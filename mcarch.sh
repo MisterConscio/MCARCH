@@ -20,7 +20,7 @@ hello() {
   printf "Irá começar o script de instalação\n"
   printf "Esse script é destinado para sistemas ${BOLD}Arch Linux${NORMAL}\n"
 
-  read -rp "Antes de começar, por farvor ${BOLD}informe seu usuário${NORMAL}: " name
+  read -rp "Antes de começar, por farvor informe seu usuário: " name
   [ ! "$(id -u "$name")" ] && error "O usuário ${name} não existe"
 
   read -rp "Por farvor, ${BOLD}informe qual é sua placa de vídeo${NORMAL} [nvidia/intel/amd]: " video
@@ -38,7 +38,7 @@ mkfilestruct() {
     /home/"$name"/media/{pic/screenshot,vid,mus,samp,proj,emu} \
     /home/"$name"/{dev,doc}
 
-  mkdir -pv /mnt/{externo,ssd,usb1,usb2,usb3}
+  mkdir -pv /mnt/{usb1,usb2,usb3}
   cd /mnt && chown -v -R "$name":"$name" ./*
 }
 
@@ -60,7 +60,7 @@ setpacman() {
 dotfiles() {
   message "Repositório dos dotfiles"
 
-  dotfiles_repo="https://github.com/MisterConscio/dotfiles.git"
+  dotfiles_repo="https://github.com/linvegas/dotfiles.git"
   dotdir="/home/$name/dotfiles"
 
   pacman --noconfirm --needed -S stow git
@@ -78,8 +78,8 @@ pacinstall() {
 
   cd /home/"$name" || error "cd failed"
 
-  curl -L "https://raw.githubusercontent.com/MisterConscio/mcarch/main/pkglist.txt" -o "$pkg_list"
-  curl -L "https://raw.githubusercontent.com/MisterConscio/mcarch/main/aurlist.txt" -o "$aur_list"
+  curl -L "https://raw.githubusercontent.com/linvegas/mcarch/main/pkglist.txt" -o "$pkg_list"
+  curl -L "https://raw.githubusercontent.com/linvegas/mcarch/main/aurlist.txt" -o "$aur_list"
 
   [ ! -f "$pkg_list" ] && error "O arquivo $pkg_list não existe"
 
