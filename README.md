@@ -3,7 +3,7 @@
 ## Usage
 
 ```sh
-curl -O "https://raw.githubusercontent.com/MisterConscio/MCARCH/main/mcarch.sh" && bash mcarch.sh
+curl -O "https://raw.githubusercontent.com/linvegas/mcarch/main/mcarch.sh" && bash mcarch.sh
 ```
 
 ## Porpuse
