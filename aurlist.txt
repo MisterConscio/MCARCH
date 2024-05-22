@@ -1,5 +1,3 @@
-nerd-fonts-droid-sans-mono
+gpu-screen-recorder-gtk-git
 xcursor-breeze
 lf
-mpdscribble
-nsxiv
