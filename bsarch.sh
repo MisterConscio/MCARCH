@@ -29,6 +29,8 @@ check_username() {
     fi
 }
 
+clear
+
 check_username
 
 info "Making file tree"
@@ -45,7 +47,7 @@ info "Pacman configuration"
 sed --regexp-extended -i "s/^#(ParallelDownloads).*/\1 = 5/;/^#Color$/s/#//;/^#VerbosePkgLists$/s/#//;/\[multilib\]/,/Include/s/#//" /etc/pacman.conf
 sed -i "s/-j2/-j$(nproc)/;/^#MAKEFLAGS/s/^#//" /etc/makepkg.conf
 
-pacman -Syyu
+pacman --noconfirm -Syyu
 
 info "Dotfiles setup"
 
@@ -61,11 +63,14 @@ trap 'rm -f /etc/sudoers.d/99_sudotemp' QUIT EXIT
 
 info "Installing programs"
 
-pkg_list="/tmp/pkglist"
-curl --verbose -L "https://raw.githubusercontent.com/linvegas/bsarch/main/pkglist.txt" -o "$pkg_list"
-[ ! -f "$pkg_list" ] && error "file '$pkg_list' doesn't exist"
+pkg_file="/tmp/pkglist"
+curl --verbose -L "https://raw.githubusercontent.com/linvegas/bsarch/main/pkglist" -o "$pkg_file"
+[ ! -f "$pkg_file" ] && error "file '$pkg_file' doesn't exist"
 
-pacman --noconfirm --needed -S - < "$pkg_list"
+# shellcheck source=pkglist
+source "$pkg_file"
+
+pacman --noconfirm --needed -S "${pac_list[@]}"
 
 yay_dir="/home/$username/repo/yay"
 
@@ -75,11 +80,7 @@ sudo -u "$username" \
 cd "$yay_dir" &&
     sudo -u "$username" makepkg -sirc --noconfirm
 
-aur_list="/tmp/aurlist"
-curl --verbose -L "https://raw.githubusercontent.com/linvegas/bsarch/main/aurlist.txt" -o "$aur_list"
-[ ! -f "$aur_list" ] && error "file '$pkg_list' doesn't exist"
-
-sudo -u "$username" yay -S --removemake --noconfirm - < "$aur_list"
+sudo -u "$username" yay -S --removemake --noconfirm "${aur_list[@]}"
 
 info "Final changes"
 
@@ -90,31 +91,29 @@ echo "PROMPT='%F{red}%B%1~%b%f %(!.#.>>) '" > /root/.zshrc
 
 usermod -aG wheel,video,audio,lp,network,kvm,storage,i2c "$username"
 
-if [ ! -e /etc/security/limits.d/00-audio.conf ]; then
+if [ ! -e "/etc/security/limits.d/00-audio.conf" ]; then
     mkdir --parents --verbose /etc/security/limits.d/
-    cat << EOF > /etc/security/limits.d/00-audio.conf
-# Realtime Scheduling for jack server
-@audio   -  rtprio     95
-@audio   -  memlock    unlimited
-EOF
+    curl -L "https://raw.githubusercontent.com/linvegas/bsarch/main/resources/00-audio.conf" \
+        -o "/etc/security/limits.d/00-audio.conf"
 fi
 
 if [ ! -f "/etc/X11/xorg.conf.d/00-keyboard.conf" ]; then
     mkdir --parents --verbose /etc/X11/xorg.conf.d
-    cat << EOF > /etc/X11/xorg.conf.d/00-keyboard.conf
-Section "InputClass"
-    Identifier "system-keyboard"
-    MatchIsKeyboard "on"
-    Option "XkbLayout" "br"
-    Option "XkbModel" "abnt2"
-    Option "XkbOptions" "terminate:ctrl_alt_bksp"
-EndSection
-EOF
+    curl -L "https://raw.githubusercontent.com/linvegas/bsarch/main/resources/00-keyboard.conf" \
+        -o "/etc/X11/xorg.conf.d/00-keyboard.conf"
+fi
+
+if [ ! -f "/etc/X11/xorg.conf.d/20-touchpad.conf" ]; then
+    mkdir --parents --verbose /etc/X11/xorg.conf.d
+    curl -L "https://raw.githubusercontent.com/linvegas/bsarch/main/resources/20-touchpad.conf" \
+        -o "/etc/X11/xorg.conf.d/20-touchpad.conf"
 fi
 
 echo "%wheel ALL=(ALL:ALL) ALL" > /etc/sudoers.d/00-sudo-wheel
 echo -e "Defaults timestamp_timeout=30\nDefaults timestamp_type=global" > /etc/sudoers.d/01-sudo-time
 echo "%wheel ALL=(ALL:ALL) NOPASSWD: /usr/bin/poweroff,/usr/bin/reboot,/usr/bin/systemctl suspend,/usr/bin/mount,/usr/bin/umount" > /etc/sudoers.d/02-cmd-nopasswd
 echo "Defaults editor=/usr/bin/nvim" > /etc/sudoers.d/03-visudo-editor
+
+rm --recursive --verbose /home/"$username"/.bash*
 
 info "The end"
