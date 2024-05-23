@@ -1,99 +1,35 @@
 pac_list=(
-    alacritty
-    alsa-utils
-    arandr
-    arc-gtk-theme
-    archlinux-wallpaper
-    asciiquarium
-    awesome
-    base-devel
-    bat
-    bc
-    beets
-    bspwm
-    btop
-    cmatrix
-    cronie
-    dash
-    ddcutil
-    dosfstools
-    dunst
-    emacs
-    fastfetch
-    firefox
-    ffmpeg
-    fzf
-    galculator
-    gdu
-    git
-    htop
-    i3-wm
-    i3lock
-    i3status
-    imagemagick
-    jq
-    keepassxc
-    lib32-pipewire
-    libnotify
-    maim
-    man-db
-    mpc
-    mpd
-    mpv
-    mupdf
-    ncmpcpp
-    neovim
-    network-manager-applet
-    noto-fonts
-    noto-fonts-emoji
-    ntfs-3g
-    numlockx
-    otf-droid-nerd
-    p7zip
-    pavucontrol
-    perl-image-exiftool
-    picom
-    pipewire
-    playerctl
-    polybar
-    pulsemixer
-    redshift
-    rofi
-    rsync
-    shellcheck
-    socat
-    stow
-    sxhkd
-    tldr
-    tmux
-    tree
-    ttf-font-awesome
-    ueberzug
-    unzip
-    usbutils
-    wireplumber
-    xclip
-    xcolor
-    xorg-server
-    xorg-setxkbmap
-    xorg-xbacklight
-    xorg-xdpyinfo
-    xorg-xev
-    xorg-xinit
-    xorg-xinput
-    xorg-xkill
-    xorg-xmodmap
-    xorg-xprop
-    xorg-xrandr
-    xorg-xrdb
-    xorg-xset
-    xorg-xwininfo
-    xss-lock
-    xwallpaper
-    yt-dlp
-    zip
-    zsh
-    zsh-syntax-highlighting
+    # Window managers
+    'awesome' 'i3-wm' 'i3lock' 'i3status' 'bspwm'
+    'arandr' 'dunst' 'libnotify' 'maim' 'ddcutil' 'network-manager-applet'
+    'numlockx' 'picom' 'polybar' 'pavucontrol' 'redshift' 'rofi'
+    'sxhkd' 'xcolor' 'xwallpaper' 'xss-lock'
+
+    # Shell utils
+    'bat' 'dosfstools' 'gdu' 'fzf' 'jq' 'highlight' 'usbutils'
+    'fastfetch' 'imagemagick' 'man-db' 'mpc' 'ntfs-3g' 'perl-image-exiftool'
+    'p7zip' 'playerctl' 'rsync' 'socat' 'stow' 'ueberzug'
+    'tldr' 'tree' 'unzip' 'xclip' 'bc' 'pulsemixer' 'ffmpeg'
+    'asciiquarium' 'cmatrix' 'btop' 'htop' 'ncmpcpp' 'yt-dlp'
+    'dash' 'zsh' 'zsh-syntax-highlighting' 'zip' 'beets' 'chafa'
+
+    # System
+    'alsa-utils' 'cronie' 'pipewire' 'lib32-pipewire'
+    'wireplumber' 'arc-gtk-theme' 'archlinux-wallpaper' 'mpd'
+    'otf-droid-nerd' 'noto-fonts' 'noto-fonts-emoji' 'ttf-font-awesome'
+    'base-devel'
+
+    # Apps
+    'alacritty' 'emacs' 'galculator' 'mpv'
+    'mupdf' 'firefox' 'keepassxc'
+
+    # Dev
+    'neovim' 'tmux' 'git' 'go' 'rustup' 'node' 'npm' 'shellcheck'
+
+    # Xorg Server
+    'xorg-server' 'xorg-setxkbmap' 'xorg-xbacklight' 'xorg-xdpyinfo' 'xorg-xev'
+    'xorg-xinit' 'xorg-xinput' 'xorg-xkill' 'xorg-xmodmap' 'xorg-xprop'
+    'xorg-xrandr' 'xorg-xrdb' 'xorg-xset' 'xorg-xwininfo'
 )
 
 aur_list=(
