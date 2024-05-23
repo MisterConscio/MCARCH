@@ -1,3 +1,0 @@
-gpu-screen-recorder-gtk-git
-xcursor-breeze
-lf
