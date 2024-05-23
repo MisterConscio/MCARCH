@@ -24,7 +24,7 @@ pac_list=(
     'mupdf' 'firefox' 'keepassxc'
 
     # Dev
-    'neovim' 'tmux' 'git' 'go' 'rustup' 'node' 'npm' 'shellcheck'
+    'neovim' 'tmux' 'git' 'go' 'rustup' 'nodejs' 'npm' 'shellcheck'
 
     # Xorg Server
     'xorg-server' 'xorg-setxkbmap' 'xorg-xbacklight' 'xorg-xdpyinfo' 'xorg-xev'
